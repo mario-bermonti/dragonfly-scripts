@@ -1,8 +1,3 @@
--------------------------------------
-
-
-
-------------------------------------------------------------
 general commands for buffers, windows, etc.
 "open file": Key("escape, c-x, c-f"),
 "save file": Key("escape, colon, w, enter"),
