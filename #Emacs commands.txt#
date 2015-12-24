@@ -23,13 +23,13 @@
 
 from dragonfly import (Grammar, AppContext, MappingRule, Dictation, Key, Text,
                        Integer, CompoundRule, Choice, RuleRef, Alternative,
-                       Repetition, Playback)
+                       Repetition)
 
 context = AppContext(title="emacs")
 grammar = Grammar("emacs", context=context)
 
-rules = MappingRule(
-    name = "emacs",
+
+class Rules(MappingRule):
     mapping = {
         # general commands for buffers, windows, etc.
         "open file": Key("escape, c-x, c-f"),
@@ -55,15 +55,13 @@ rules = MappingRule(
         "only buffer": Key("c-x, 1"),
         "exit emacs": Key("c-x, c-c"),
         "go to buffer": Key("c-x, b"),
-        "run file": Key("c-c, c-c") + Key("enter") + Text("y") + Key("c-c, c-z"),
+        "run file":  Key("c-c, c-c"),
         "go to python": Key("c-c, c-z"),
 
         # programming constructs
         "new class": Key("c-c, c-t, c"),
         "new function": Key("c-c, c-t, d"),
         "new conditional": Key("c-c, c-t, i"),
-        "new elif": Key("escape") + Key("i") + Text("elif :") + Key("left"),
-        "new else": Key("i") + Text("else:") + Key("escape, o"),
         "new while loop": Key("c-c, c-t, w"),
         "new for loop": Key("c-c, c-t, f"),
         "new try block": Key("c-c, c-t, t"),
@@ -75,26 +73,25 @@ rules = MappingRule(
         "find coordinates": Text("coords()") + Key("escape, i"),
         "define in it": Text("__init__"),
         "append": Text(".append()") + Key("escape, i"),
-        "jason": Text("json"),
 
         # movements
-        "go to last": Key("escape, dollar"),
-        "go to start": Key("escape, caret"),
-        "go to top": Key("escape, 1, G"),
-        "go to bottom": Key("escape, G"),
+        "to last": Key("dollar"),
+        "to start": Key("caret"),
+        "to top": Key("1, G"),
+        "to bottom": Key("G"),
         "visualline": Key("home"),
         "go up [<n>] ": Key("escape") + Text("%(n)d") + Key("k"),
         "go down [<n>]": Key("escape") + Text("%(n)d") + Key("j"),
         "scroll [<scroll_by>] down": Text("%(scroll_by)d") + Key("c-f"),
         "scroll [<scroll_by>] up": Text("%(scroll_by)d") + Key("c-b"),
-        "jump [<n>]": Key("escape, w:%(n)d"),
-        "jump back [<n>]": Key("escape, b:%(n)d"),
-        "bow [<n>]": Key("escape, e:%(n)d"),
+        "jump [<n>]": Key("w:%(n)d"),
+        "jump back [<n>]": Key("b:%(n)d"),
+        "bow [<n>]": Key("e:%(n)d"),
         "paragraph down [<n>]": Text("%(n)d") + Key("a-lbrace"),
         "paragraph up [<n>]": Text("%(n)d") + Key("a-rbrace"),
         "prior bracket [<n>]": Text("%(n)d") + Key("escape:down, c-b, escape:up"),
         "next bracket [<n>]": Text("%(n)d") + Key("escape:down, c-f, escape:up"),
-        "go to line [<n>]": Key("escape") + Text("%(n)d") + Key("G"),
+        "go to line [<n>]": Text("%(n)d") + Key("G"),
         "set mark": Key("c-space, c-space"),
         "go back": Key("c-u, c-space"),
         "scroll up other buffer": Key("a-pgup"),
@@ -200,10 +197,7 @@ rules = MappingRule(
         "doubles": Key("dquote, dquote, escape, i"),
         "singles": Key("squote, squote, escape, i"),
         "exclamation": Key("exclamation"),
-        "greater than": Text(" > "),
-        "smaller than": Text(" < "),
-        "greater or equal to": Text(" >= "),
-        "smaller or equal to": Text(" <= "),
+        "greater than": Text(" => "),
         "double equals": Text(" == "),
         "not equals": Text(" != "),
         "pound": Text("#"),
@@ -214,11 +208,11 @@ rules = MappingRule(
 
         # editing
         "insert": Key("escape, i"),
+        "indent [<n>]": Key("escape") + Text("%(n)d") + Key("rangle, rangle"),
+        "indent out [<n>]": Key("escape") + Text("%(n)d") + Key("langle, langle"),
         "small insert": Key("escape, a"),
         "bic insert": Key("escape, A"),
         "insert at beginning": Key("escape, s-i"),
-        "indent [<n>]": Key("escape") + Text("%(n)d") + Key("rangle, rangle"),
-        "indent out [<n>]": Key("escape") + Text("%(n)d") + Key("langle, langle"),
         "change case": Key("tilde"),
         "kill line before [<n>]": Key("escape") + Text("%(n)d") + Key("k, d, d"),
         "kill line after [<n>]": Key("escape") + Text("%(n)d") + Key("j, d, d, k"),
@@ -227,17 +221,16 @@ rules = MappingRule(
         "kill [<n>] line": Key("escape") + Text("%(n)d") + Key("d, d"),
         "kill [<n>] word": Key("escape") + Text("%(n)d") + Key("d, w"),
         "kill last word [<n>]": Key("escape") + Text("%(n)d") + Key("d, b"),
-        "delete line [<n>]": Key("escape") + Text("%(n)d") + Key("d, d"),
-        "replace text": Key("s"),
+        "delete line [<n>]": Text("%(n)d") + Key("d, d"),
         "open line": Key("escape, o"),
         "open line before": Key("escape, O"),
-        "yank": Key("escape") + Key("y"),
-        "big yank": Key("escape") + Key("Y"),
-        "put previous": Key("escape") + Key("c-p"),
-        "put": Key("escape") + Key("p"),
-        "big put": Key("escape") + Key("P"),
-        "cut": Key("c-x"),
-        "duplicate line": Key("escape") + Key("Y, P"),
+        "yank": Key("y"),
+        "big yank": Key("Y"),
+        "put previous": Key("c-p"),
+        "put": Key("p"),
+        "big put": Key("P"),
+        "cut":  Key("c-x"),
+        "duplicate line": Key("Y, P"),
         "that's all": Key("escape, g, g, V, G"),
         "undo [<n>]": Text("%(n)d") + Key("c-underscore"),
         "scratch": Key("escape, u"),
@@ -248,11 +241,10 @@ rules = MappingRule(
         "add blank": Key("escape, b, i, space, escape"),
         "add blank after": Key("escape, e, a, space, escape"),
         "remove blank after": Key("escape, f, space, x"),
-        "comment out": Key("s-i") + Text("#") + Key("escape"),
+        "comment out": Key("home, i") + Text("#") + Key("escape"),
         "join lines": Key("J"),
-        "grab [<n>] word": Key("escape, b, v") +  Text("%(n)d") + Key("e"),
-        "grab word from beginning": Key("escape, v") + Key("e"),
-        "grab [<n>] lines": Key("escape, home, v") +  Text("%(n)d") + Key("j, k, end"),
+        "grap [<n>] word": Key("escape, b, v") +  Text("%(n)d") + Key("e"),
+        "grap [<n>] lines": Key("escape, home, v") +  Text("%(n)d") + Key("j, k, end"),
         "search and replace": Key("a-percent"),
 
         # modes
@@ -267,7 +259,6 @@ rules = MappingRule(
         "open project directory": Key("escape, c, c, p, D"),
         "catch file": Key("escape, c, c, p, z"),
         "close all project files": Key("escape, c, c, p, k"),
-        "save all project files": Key(" escape,c-c, p, S"),
 
 
         # Jedi mode
@@ -275,21 +266,21 @@ rules = MappingRule(
         "look for documentation": Key("escape, c, c, question"),
         "look for function details": Key("escape, c, c, slash"),
         "jedi go back": Key("escape, c, c, comma"),
-    },
+    }
 
     extras = [
         Dictation("text", format=False),
         Dictation("mark", format=False),
         Integer("n", 1, 20000),
         Integer("scroll_by", 1, 20000),
-      ],
+      ]
     defaults = {
       "text" : "",
       "mark": "a",
       "n" : 1,
       "scroll_by" : 1
       }
-    )
+
 
 
 class Identifiers(CompoundRule):
@@ -339,9 +330,19 @@ class Identifiers(CompoundRule):
         Text(spec[3].join(words)).execute()
 
 
+alternatives = []
+alternatives.append(RuleRef(rule=Rules()))
+keystroke = Alternative(alternatives)
+sequence = Repetition(keystroke,
+                      min=1,
+                      max=16,
+                      name="sequence"
+           )
+
 grammar.add_rule(Identifiers())
-grammar.add_rule(rules)
+grammar.add_rule(Rules())
 grammar.load()
+ up
 
 
 def unload():
